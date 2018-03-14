@@ -1,0 +1,18 @@
+import findspark
+findspark.init()
+
+from pyspark import *
+
+import os
+import sys
+
+conf = SparkConf().setAppName("sample_app")
+sc = SparkContext(conf=conf)
+
+spark_home = os.environ.get('SPARK_HOME', None)
+
+text_file = sc.textFile("hdfs:///user/hpds/test")
+
+counts = text_file.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b)
+
+counts.saveAsTextFile("hdfs:///user/hpds/python_spark_wordcount")
